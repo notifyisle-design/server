@@ -1,2 +1,4 @@
 g4f[api]
 uvicorn
+nodriver
+platformdirs
