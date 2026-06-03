@@ -1,0 +1,984 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f8fa" />
+  <title>토스백신</title>
+  <style>
+    :root {
+      --blue: #3182f6;
+      --blue-weak: #e8f3ff;
+      --bg: #f7f8fa;
+      --surface: #ffffff;
+      --surface-2: #f2f4f6;
+      --text: #191f28;
+      --sub: #6b7684;
+      --muted: #8b95a1;
+      --line: #e5e8eb;
+      --green: #20c997;
+      --red: #f04452;
+      --yellow: #ffb020;
+      --shadow: 0 18px 48px rgba(3, 18, 40, 0.08);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: radial-gradient(circle at top, #eef6ff 0, var(--bg) 390px);
+      color: var(--text);
+      font-family: "Toss Product Sans", "Tossface", "SF Pro KR", "SF Pro Display", Pretendard,
+        -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", Roboto, "Noto Sans KR", sans-serif;
+      letter-spacing: -0.02em;
+    }
+
+    button,
+    input { font: inherit; }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .page-shell {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 14px;
+    }
+
+    .phone {
+      position: relative;
+      width: min(100%, 390px);
+      height: min(844px, calc(100vh - 28px));
+      min-height: 720px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 36px;
+      background: var(--bg);
+      box-shadow: var(--shadow);
+    }
+
+    .phone::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 190px;
+      background: linear-gradient(#e8f3ff, rgba(232, 243, 255, 0));
+      pointer-events: none;
+    }
+
+    .status-bar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 28px 0;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .battery {
+      display: inline-block;
+      width: 21px;
+      height: 13px;
+      margin-left: 5px;
+      border: 2px solid var(--text);
+      border-radius: 4px;
+      vertical-align: -2px;
+    }
+
+    .app-header {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 20px 10px;
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .app-title {
+      margin: 4px 0 0;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.045em;
+    }
+
+    .avatar {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--blue-weak);
+      color: var(--blue);
+      font-weight: 900;
+    }
+
+    .avatar::after {
+      content: "ON";
+      position: absolute;
+      right: -3px;
+      bottom: -4px;
+      padding: 2px 5px;
+      border-radius: 999px;
+      background: #e6f8f0;
+      color: #0ca678;
+      font-size: 9px;
+      font-weight: 900;
+    }
+
+    .header-settings {
+      position: absolute;
+      right: 20px;
+      bottom: -14px;
+      background: transparent;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      height: calc(100% - 32px);
+      overflow-y: auto;
+      padding: 4px 20px 96px;
+      scrollbar-width: none;
+    }
+
+    .content::-webkit-scrollbar { display: none; }
+
+    .auth-screen {
+      min-height: 745px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding-top: 52px;
+    }
+
+    .brand-icon,
+    .hero-icon {
+      display: grid;
+      place-items: center;
+      width: 66px;
+      height: 66px;
+      border-radius: 24px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 32px;
+      font-weight: 900;
+    }
+
+    .hero-icon {
+      width: 96px;
+      height: 96px;
+      margin: 0 auto 28px;
+      border-radius: 32px;
+      background: var(--blue-weak);
+      color: var(--blue);
+      font-size: 48px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p { margin-top: 0; }
+
+    .headline {
+      margin: 28px 0 0;
+      white-space: pre-line;
+      font-size: 32px;
+      line-height: 1.18;
+      font-weight: 950;
+      letter-spacing: -0.065em;
+    }
+
+    .lead {
+      margin: 14px 0 0;
+      color: var(--sub);
+      font-size: 16px;
+      line-height: 1.7;
+      font-weight: 750;
+    }
+
+    .form { margin-top: 38px; display: grid; gap: 12px; }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field span {
+      padding-left: 3px;
+      color: var(--sub);
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .input {
+      width: 100%;
+      height: 58px;
+      border: 1px solid transparent;
+      outline: none;
+      border-radius: 18px;
+      background: var(--surface);
+      padding: 0 16px;
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 760;
+      box-shadow: 0 1px 0 rgba(25, 31, 40, 0.02);
+    }
+
+    .input:focus { border-color: rgba(49, 130, 246, 0.45); background: #fff; }
+    .input::placeholder { color: #b0b8c1; }
+
+    .button-row { display: grid; gap: 10px; padding-bottom: 4px; }
+
+    .btn {
+      width: 100%;
+      min-height: 54px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: #4e5968;
+      padding: 0 18px;
+      font-size: 16px;
+      font-weight: 900;
+      transition: transform 0.12s ease, opacity 0.12s ease, background 0.12s ease;
+    }
+
+    .btn:active { transform: scale(0.985); }
+    .btn.primary { background: var(--blue); color: #fff; }
+    .btn.ghost { background: transparent; color: #4e5968; }
+    .btn.soft { background: var(--blue-weak); color: var(--blue); }
+    .btn.danger { background: #fff0f1; color: var(--red); }
+    .btn:disabled { cursor: not-allowed; opacity: 0.45; }
+
+    .stack-page { min-height: 745px; padding-top: 22px; }
+
+    .back {
+      width: auto;
+      min-height: 38px;
+      margin: 0 0 26px -8px;
+      background: transparent;
+      color: #4e5968;
+      padding: 0 8px;
+      font-size: 15px;
+    }
+
+    .blue-label { margin: 0; color: var(--blue); font-size: 14px; font-weight: 900; }
+    .hint { margin: 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+
+    .bottom-cta {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      bottom: 18px;
+      z-index: 4;
+    }
+
+    .center-screen {
+      min-height: 745px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding-top: 82px;
+      text-align: center;
+    }
+
+    .card {
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: 0 1px 0 rgba(25, 31, 40, 0.02);
+    }
+
+    .score-card { padding: 22px 20px 20px; }
+
+    .score-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .score-label { margin: 0; color: var(--sub); font-size: 14px; font-weight: 900; }
+
+    .score-number {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      margin-top: 3px;
+      font-weight: 950;
+      letter-spacing: -0.075em;
+    }
+
+    .score-number strong { font-size: 54px; line-height: 0.95; }
+    .score-number span { padding-bottom: 5px; font-size: 20px; }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 30px;
+      border-radius: 999px;
+      padding: 0 11px;
+      background: #e6f8f0;
+      color: #0ca678;
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .chip.blue { background: var(--blue-weak); color: var(--blue); }
+    .chip.red { background: #fff0f1; color: var(--red); }
+    .chip.yellow { background: #fff7e6; color: #d97904; }
+
+    .progress {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-2);
+    }
+
+    .progress > i {
+      display: block;
+      height: 100%;
+      width: var(--value, 0%);
+      border-radius: inherit;
+      background: var(--blue);
+      transition: width 0.18s ease;
+    }
+
+    .home-grid { display: grid; gap: 14px; padding-top: 6px; }
+    .mini-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+    .mini {
+      display: grid;
+      justify-items: center;
+      padding: 14px 8px 12px;
+      text-align: center;
+    }
+
+    .dot { width: 8px; height: 8px; margin-bottom: 9px; border-radius: 50%; background: #d1d6db; }
+    .dot.on { background: var(--green); }
+    .mini strong { font-size: 14px; font-weight: 950; }
+    .mini span:last-child { margin-top: 4px; color: var(--muted); font-size: 12px; font-weight: 850; }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 4px;
+    }
+
+    .section-title h2 { margin: 0; font-size: 20px; font-weight: 950; letter-spacing: -0.045em; }
+    .text-btn { background: transparent; color: var(--blue); font-size: 14px; font-weight: 900; }
+
+    .list { display: grid; gap: 10px; }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      border-radius: var(--radius);
+      background: var(--surface);
+      padding: 14px;
+      text-align: left;
+    }
+
+    .row-icon {
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      width: 48px;
+      height: 48px;
+      border-radius: 18px;
+      background: var(--surface-2);
+      font-size: 24px;
+    }
+
+    .row-text { min-width: 0; flex: 1; }
+    .row-title { margin: 0; font-size: 16px; font-weight: 950; letter-spacing: -0.035em; }
+    .row-desc { margin: 4px 0 0; color: var(--muted); font-size: 13px; font-weight: 750; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .chev { color: #b0b8c1; font-size: 25px; font-weight: 900; }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 16px;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.72);
+    }
+
+    .tab {
+      min-height: 38px;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .tab.active { background: var(--blue); color: #fff; }
+
+    .scan-hero { padding: 25px 20px; text-align: center; }
+    .scan-circle { display: grid; place-items: center; width: 112px; height: 112px; margin: 0 auto 22px; border-radius: 50%; background: var(--blue-weak); font-size: 52px; }
+    .scan-hero h2, .detail-heading { margin: 0; font-size: 27px; font-weight: 950; letter-spacing: -0.06em; }
+    .scan-hero p { margin: 11px 0 0; color: var(--sub); font-size: 15px; line-height: 1.7; font-weight: 750; }
+
+    .history-row { justify-content: space-between; }
+    .history-row .chip { flex: 0 0 auto; }
+
+    .setting-row { justify-content: space-between; }
+
+    .switch {
+      position: relative;
+      width: 51px;
+      height: 31px;
+      border-radius: 999px;
+      background: #d1d6db;
+      transition: background 0.16s ease;
+      flex: 0 0 auto;
+    }
+
+    .switch::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(25,31,40,0.16);
+      transition: transform 0.16s ease;
+    }
+
+    .switch.on { background: var(--blue); }
+    .switch.on::after { transform: translateX(20px); }
+
+    .guide-card { padding: 20px; }
+    .guide-card h3 { margin: 13px 0 0; font-size: 18px; font-weight: 950; letter-spacing: -0.045em; }
+    .guide-card p { margin: 8px 0 0; color: var(--sub); font-size: 14px; line-height: 1.65; font-weight: 740; }
+
+    .bottom-nav {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      border-top: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 8px 12px 16px;
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-item {
+      min-height: 46px;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 950;
+    }
+
+    .nav-item.active { color: var(--blue); background: var(--blue-weak); }
+
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(25, 31, 40, 0.32);
+      backdrop-filter: blur(6px);
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      width: 100%;
+      border-radius: 26px;
+      background: #fff;
+      padding: 24px 20px 18px;
+      box-shadow: 0 24px 60px rgba(3, 18, 40, 0.18);
+    }
+
+    .modal h2 { margin: 0; font-size: 22px; font-weight: 950; }
+    .modal p { margin: 10px 0 18px; color: var(--sub); font-size: 15px; line-height: 1.65; font-weight: 740; }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 430px) {
+      .page-shell { padding: 0; }
+      .phone {
+        width: 100vw;
+        height: 100vh;
+        min-height: 100vh;
+        border: 0;
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="phone" aria-label="토스백신 모바일 앱">
+      <div class="status-bar"><span>9:41</span><span>5G <i class="battery"></i></span></div>
+      <header class="app-header hidden" id="appHeader">
+        <div>
+          <p class="eyebrow">토스백신</p>
+          <h1 class="app-title"><span id="headerName">민준</span>님, 안심하세요</h1>
+        </div>
+        <div class="avatar" id="avatar">민</div>
+        <button class="header-settings" data-detail="settings">설정</button>
+      </header>
+      <div class="content" id="screen"></div>
+      <nav class="bottom-nav hidden" id="bottomNav">
+        <button class="nav-item active" data-nav="home">홈</button>
+        <button class="nav-item" data-nav="scan">검사</button>
+        <button class="nav-item" data-nav="history">기록</button>
+        <button class="nav-item" data-nav="settings">설정</button>
+      </nav>
+      <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal">
+          <h2 id="modalTitle">검사가 끝났어요</h2>
+          <p>위험한 항목은 발견되지 않았어요. 오늘도 휴대전화를 안전하게 지키고 있어요.</p>
+          <button class="btn primary" id="modalClose">확인했어요</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const screenEl = document.querySelector('#screen');
+    const headerEl = document.querySelector('#appHeader');
+    const navEl = document.querySelector('#bottomNav');
+    const modalEl = document.querySelector('#modalBackdrop');
+    const modalClose = document.querySelector('#modalClose');
+
+    const state = {
+      screen: 'login',
+      detail: 'scan',
+      user: { name: '민준', phone: '01012345678', email: 'toss@safe.app' },
+      form: { name: '', email: '', password: '', phone: '', code: '' },
+      loggedIn: false,
+      otpSent: false,
+      timer: 0,
+      scanProgress: 0,
+      scanning: false,
+      autoProtect: true,
+      linkGuard: true,
+      wifiGuard: false,
+      history: [
+        { id: 1, title: '앱 설치 파일 42개', result: '위험한 항목이 없어요', time: '방금 전', status: 'safe' },
+        { id: 2, title: '문자 링크 보호', result: '의심 링크 1개를 막았어요', time: '어제', status: 'blocked' },
+        { id: 3, title: '권한 점검', result: '카메라 권한 앱 2개 확인 필요', time: '2일 전', status: 'watch' }
+      ]
+    };
+
+    const statusCopy = { safe: '안전', watch: '확인 필요', blocked: '차단됨' };
+    const chipClass = { safe: '', watch: 'yellow', blocked: 'red' };
+
+    const setScreen = (screen) => {
+      state.screen = screen;
+      render();
+    };
+
+    const setDetail = (detail) => {
+      state.detail = detail;
+      state.screen = 'detail';
+      render();
+    };
+
+    const updateForm = (key, value) => {
+      state.form[key] = value;
+    };
+
+    const saveUser = () => {
+      localStorage.setItem('toss-vaccine-user', JSON.stringify(state.user));
+    };
+
+    const loadUser = () => {
+      const saved = localStorage.getItem('toss-vaccine-user');
+      if (!saved) return;
+      try {
+        state.user = JSON.parse(saved);
+        state.loggedIn = true;
+        state.screen = 'home';
+      } catch {
+        localStorage.removeItem('toss-vaccine-user');
+      }
+    };
+
+    const safeScore = () => {
+      const deduction = state.history.filter((item) => item.status !== 'safe').length * 4;
+      return Math.max(82, 96 - deduction + (state.autoProtect ? 3 : 0) + (state.linkGuard ? 2 : 0));
+    };
+
+    const appChromeVisible = () => state.loggedIn && !['login', 'signup', 'phone', 'welcome'].includes(state.screen);
+
+    const renderChrome = () => {
+      const visible = appChromeVisible();
+      headerEl.classList.toggle('hidden', !visible);
+      navEl.classList.toggle('hidden', !visible);
+      document.querySelector('#headerName').textContent = state.user.name;
+      document.querySelector('#avatar').textContent = state.user.name.slice(0, 1) || '토';
+      document.querySelectorAll('.nav-item').forEach((item) => {
+        const key = item.dataset.nav;
+        item.classList.toggle('active', state.screen === 'home' ? key === 'home' : key === state.detail);
+      });
+    };
+
+    const shell = (body) => {
+      screenEl.innerHTML = body;
+      bindEvents();
+      renderChrome();
+      screenEl.scrollTop = 0;
+    };
+
+    const input = (key, label, placeholder, type = 'text', hint = '') => `
+      <label class="field">
+        <span>${label}</span>
+        <input class="input" data-input="${key}" value="${escapeHtml(state.form[key] || '')}" placeholder="${placeholder}" type="${type}" />
+        ${hint ? `<p class="hint">${hint}</p>` : ''}
+      </label>
+    `;
+
+    const render = () => {
+      if (state.screen === 'login') return renderLogin();
+      if (state.screen === 'signup') return renderSignup();
+      if (state.screen === 'phone') return renderPhone();
+      if (state.screen === 'welcome') return renderWelcome();
+      if (state.screen === 'home') return renderHome();
+      return renderDetail();
+    };
+
+    const renderLogin = () => shell(`
+      <section class="auth-screen">
+        <div>
+          <div class="brand-icon">✓</div>
+          <h1 class="headline">휴대전화 보안도\n토스처럼 쉽게</h1>
+          <p class="lead">복잡한 백신 설정은 줄이고, 꼭 필요한 보호만 한눈에 보여드릴게요.</p>
+          <div class="form">
+            ${input('email', '이메일', 'safe@toss.app', 'email')}
+            ${input('password', '비밀번호', '8자리 이상', 'password')}
+          </div>
+        </div>
+        <div class="button-row">
+          <button class="btn primary" data-action="login">로그인하기</button>
+          <button class="btn ghost" data-action="signup">처음이라면 가입하기</button>
+        </div>
+      </section>
+    `);
+
+    const renderSignup = () => shell(`
+      <section class="stack-page">
+        <button class="btn back" data-action="back-login">← 뒤로</button>
+        <p class="blue-label">회원가입</p>
+        <h1 class="headline">딱 필요한 정보만\n받을게요</h1>
+        <p class="lead">쉽고 빠르게 끝낼 수 있게 준비했어요.</p>
+        <div class="form">
+          ${input('name', '이름', '홍길동')}
+          ${input('email', '이메일', 'safe@toss.app', 'email')}
+          ${input('password', '비밀번호', '8자리 이상', 'password')}
+        </div>
+        <div class="bottom-cta"><button class="btn primary" data-action="create-account">휴대전화 인증하기</button></div>
+      </section>
+    `);
+
+    const renderPhone = () => shell(`
+      <section class="stack-page">
+        <button class="btn back" data-action="back-signup">← 뒤로</button>
+        <p class="blue-label">휴대전화 인증</p>
+        <h1 class="headline">본인 휴대전화인지\n확인할게요</h1>
+        <p class="lead">문자 대신 프로토타입 인증번호를 바로 넣어드릴게요.</p>
+        <div class="form">
+          ${input('phone', '휴대전화 번호', '01012345678', 'tel')}
+          <button class="btn soft" data-action="send-otp">${state.otpSent ? `인증번호 다시 받기 ${state.timer ? state.timer + 's' : ''}` : '인증번호 받기'}</button>
+          ${state.otpSent ? input('code', '인증번호', '123456', 'text', '프로토타입에서는 123456이 자동 입력돼요.') : ''}
+        </div>
+        <div class="bottom-cta"><button class="btn primary" data-action="verify-phone" ${state.otpSent ? '' : 'disabled'}>인증 완료</button></div>
+      </section>
+    `);
+
+    const renderWelcome = () => shell(`
+      <section class="center-screen">
+        <div>
+          <div class="hero-icon">🛡️</div>
+          <h1 class="headline">${escapeHtml(state.user.name)}님,\n이제 안전해요</h1>
+          <p class="lead">검사, 차단, 기록 확인까지 한 화면에서 자연스럽게 이어져요.</p>
+        </div>
+        <button class="btn primary" data-action="start-home">시작하기</button>
+      </section>
+    `);
+
+    const renderHome = () => {
+      const score = safeScore();
+      shell(`
+        <section class="home-grid">
+          <article class="card score-card">
+            <div class="score-top">
+              <div>
+                <p class="score-label">오늘의 보안 점수</p>
+                <div class="score-number"><strong>${score}</strong><span>점</span></div>
+              </div>
+              <span class="chip">좋아요</span>
+            </div>
+            <div class="progress" style="--value: ${score}%"><i></i></div>
+            <p class="lead">${escapeHtml(state.user.name)}님의 휴대전화는 주요 보호 기능이 켜져 있어요.</p>
+            <button class="btn primary" data-action="start-scan">지금 검사하기</button>
+          </article>
+          <div class="mini-grid">
+            ${miniStatus('실시간', state.autoProtect)}
+            ${miniStatus('링크', state.linkGuard)}
+            ${miniStatus('Wi‑Fi', state.wifiGuard)}
+          </div>
+          ${sectionTitle('빠른 보호', '전체보기', 'guide')}
+          <div class="list">
+            ${actionRow('🔍', '전체 기기 검사', '앱, 파일, 권한을 빠르게 확인해요', 'scan')}
+            ${actionRow('🔗', '문자 링크 보호', '피싱으로 의심되는 주소를 알려줘요', 'guide')}
+            ${actionRow('📶', '공용 Wi‑Fi 점검', '안전하지 않은 네트워크를 확인해요', 'settings')}
+          </div>
+          ${sectionTitle('최근 기록', '더보기', 'history')}
+          <div class="list">${state.history.slice(0, 2).map(historyRow).join('')}</div>
+        </section>
+      `);
+    };
+
+    const renderDetail = () => {
+      const body = state.detail === 'scan' ? scanDetail()
+        : state.detail === 'history' ? historyDetail()
+        : state.detail === 'settings' ? settingsDetail()
+        : guideDetail();
+
+      shell(`
+        <section>
+          <button class="btn back" data-action="home">← 홈으로</button>
+          <div class="tabs">
+            ${tab('scan', '검사')}
+            ${tab('history', '기록')}
+            ${tab('settings', '설정')}
+            ${tab('guide', '가이드')}
+          </div>
+          ${body}
+        </section>
+      `);
+    };
+
+    const scanDetail = () => `
+      <div class="list">
+        <article class="card scan-hero">
+          <div class="scan-circle">🔎</div>
+          <h2>${state.scanning ? '꼼꼼히 보는 중이에요' : '검사를 시작해볼까요?'}</h2>
+          <p>백신 엔진은 실제 동작하지 않지만, 검사 흐름과 기록 저장은 작동해요.</p>
+          <div class="progress" style="--value: ${state.scanProgress}%"><i></i></div>
+          <button class="btn primary" data-action="start-scan">${state.scanning ? state.scanProgress + '% 검사 중' : '전체 검사 시작'}</button>
+        </article>
+        ${actionRow('📁', '파일 검사', '다운로드 폴더를 확인해요')}
+        ${actionRow('📱', '앱 권한 검사', '과도한 권한을 가진 앱을 알려줘요')}
+        ${actionRow('💬', '문자 링크 검사', '최근 받은 링크의 위험도를 살펴봐요')}
+      </div>
+    `;
+
+    const historyDetail = () => `
+      <div class="list">
+        <h2 class="detail-heading">보안 기록</h2>
+        ${state.history.map(historyRow).join('')}
+      </div>
+    `;
+
+    const settingsDetail = () => `
+      <div class="list">
+        <h2 class="detail-heading">보호 설정</h2>
+        ${settingRow('autoProtect', '실시간 보호', '새 앱과 파일을 자동으로 살펴봐요', state.autoProtect)}
+        ${settingRow('linkGuard', '문자 링크 보호', '위험한 링크를 누르기 전에 알려줘요', state.linkGuard)}
+        ${settingRow('wifiGuard', '공용 Wi‑Fi 알림', '안전하지 않은 네트워크를 알려줘요', state.wifiGuard)}
+        <button class="btn danger" data-action="logout">로그아웃</button>
+      </div>
+    `;
+
+    const guideDetail = () => `
+      <div class="list">
+        <h2 class="detail-heading">안전하게 쓰는 법</h2>
+        ${guideCard('1', '모르는 링크는 한 번 더 확인해요', '짧은 주소, 급한 입금 요청, 택배 사칭 문자는 바로 열지 않는 게 좋아요.')}
+        ${guideCard('2', '앱 권한은 필요한 만큼만', '연락처, 위치, 카메라 권한은 자주 확인하고 쓰지 않는 앱은 정리해요.')}
+        ${guideCard('3', '공용 Wi‑Fi에서는 조심해요', '로그인이나 결제는 신뢰할 수 있는 네트워크에서 하는 걸 권장해요.')}
+      </div>
+    `;
+
+    const miniStatus = (title, active) => `
+      <article class="card mini"><span class="dot ${active ? 'on' : ''}"></span><strong>${title}</strong><span>${active ? '켜짐' : '꺼짐'}</span></article>
+    `;
+
+    const sectionTitle = (title, action, detail) => `
+      <div class="section-title"><h2>${title}</h2><button class="text-btn" data-detail="${detail}">${action}</button></div>
+    `;
+
+    const actionRow = (icon, title, desc, detail = '') => `
+      <button class="row" ${detail ? `data-detail="${detail}"` : ''}>
+        <span class="row-icon">${icon}</span>
+        <span class="row-text"><span class="row-title">${title}</span><span class="row-desc">${desc}</span></span>
+        <span class="chev">›</span>
+      </button>
+    `;
+
+    const historyRow = (item) => `
+      <article class="row history-row">
+        <span class="row-text"><span class="row-title">${item.title}</span><span class="row-desc">${item.result} · ${item.time}</span></span>
+        <span class="chip ${chipClass[item.status]}">${statusCopy[item.status]}</span>
+      </article>
+    `;
+
+    const settingRow = (key, title, desc, selected) => `
+      <button class="row setting-row" data-toggle="${key}">
+        <span class="row-text"><span class="row-title">${title}</span><span class="row-desc">${desc}</span></span>
+        <span class="switch ${selected ? 'on' : ''}" aria-hidden="true"></span>
+      </button>
+    `;
+
+    const guideCard = (step, title, desc) => `
+      <article class="card guide-card"><span class="chip blue">${step}</span><h3>${title}</h3><p>${desc}</p></article>
+    `;
+
+    const tab = (key, label) => `<button class="tab ${state.detail === key ? 'active' : ''}" data-detail="${key}">${label}</button>`;
+
+    function bindEvents() {
+      screenEl.querySelectorAll('[data-input]').forEach((el) => {
+        el.addEventListener('input', (event) => updateForm(event.target.dataset.input, event.target.value));
+      });
+
+      document.querySelectorAll('[data-detail]').forEach((el) => {
+        el.addEventListener('click', () => setDetail(el.dataset.detail));
+      });
+
+      screenEl.querySelectorAll('[data-toggle]').forEach((el) => {
+        el.addEventListener('click', () => {
+          const key = el.dataset.toggle;
+          state[key] = !state[key];
+          render();
+        });
+      });
+
+      screenEl.querySelectorAll('[data-action]').forEach((el) => {
+        el.addEventListener('click', () => handleAction(el.dataset.action));
+      });
+    }
+
+    function handleAction(action) {
+      if (action === 'login') {
+        state.loggedIn = true;
+        setScreen('home');
+      }
+      if (action === 'signup') setScreen('signup');
+      if (action === 'back-login') setScreen('login');
+      if (action === 'back-signup') setScreen('signup');
+      if (action === 'home') setScreen('home');
+      if (action === 'create-account') {
+        state.user = {
+          name: state.form.name || '토스',
+          email: state.form.email || 'safe@toss.app',
+          phone: state.form.phone || '01012345678'
+        };
+        setScreen('phone');
+      }
+      if (action === 'send-otp') {
+        state.otpSent = true;
+        state.timer = 59;
+        state.form.code = '123456';
+        render();
+      }
+      if (action === 'verify-phone') {
+        state.loggedIn = true;
+        saveUser();
+        setScreen('welcome');
+      }
+      if (action === 'start-home') setScreen('home');
+      if (action === 'start-scan') startScan();
+      if (action === 'logout') {
+        localStorage.removeItem('toss-vaccine-user');
+        state.loggedIn = false;
+        setScreen('login');
+      }
+    }
+
+    function startScan() {
+      if (state.scanning) return;
+      state.screen = 'detail';
+      state.detail = 'scan';
+      state.scanProgress = 0;
+      state.scanning = true;
+      render();
+      const interval = setInterval(() => {
+        state.scanProgress = Math.min(100, state.scanProgress + 4);
+        render();
+        if (state.scanProgress >= 100) {
+          clearInterval(interval);
+          state.scanning = false;
+          state.history.unshift({
+            id: Date.now(),
+            title: '전체 기기 검사',
+            result: '지금은 걱정할 게 없어요',
+            time: '방금 전',
+            status: 'safe'
+          });
+          render();
+          modalEl.classList.add('open');
+        }
+      }, 130);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    navEl.addEventListener('click', (event) => {
+      const item = event.target.closest('[data-nav]');
+      if (!item) return;
+      if (item.dataset.nav === 'home') setScreen('home');
+      else setDetail(item.dataset.nav);
+    });
+
+    modalClose.addEventListener('click', () => modalEl.classList.remove('open'));
+    modalEl.addEventListener('click', (event) => {
+      if (event.target === modalEl) modalEl.classList.remove('open');
+    });
+
+    setInterval(() => {
+      if (!state.timer) return;
+      state.timer -= 1;
+      if (state.screen === 'phone') render();
+    }, 1000);
+
+    loadUser();
+    render();
+  </script>
+</body>
+</html>
